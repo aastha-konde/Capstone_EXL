@@ -1,0 +1,84 @@
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+retailmart.duckdb
+retailmart_backup.duckdb
+chroma_data/
+
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+dist/
+build/
+.turbo/
+
+# Backend
+backend/.env
+backend/.env.local
+backend/logs/
+backend/uploads/
+
+# Frontend
+frontend/.env.local
+frontend/dist/
+frontend/build/
+
+# Docker
+.dockerignore
+
+# Misc
+.DS_Store
+.env.example.local
+*.log
+temp/
+tmp/

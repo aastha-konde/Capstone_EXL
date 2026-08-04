@@ -1,0 +1,78 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: retailmart-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-retailmart}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-retailmart_secure_pw}
+      POSTGRES_DB: ${POSTGRES_DB:-retailmart_dw}
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./data_warehouse/schema:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-retailmart}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - retailmart
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: retailmart-backend
+    environment:
+      ENVIRONMENT: ${ENVIRONMENT:-development}
+      DEBUG: ${DEBUG:-false}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
+      OPENROUTER_MODEL: ${OPENROUTER_MODEL:-qwen/qwen-2.5-72b-instruct}
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: ${POSTGRES_USER:-retailmart}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-retailmart_secure_pw}
+      POSTGRES_DB: ${POSTGRES_DB:-retailmart_dw}
+      DUCKDB_PATH: /app/data/retailmart.duckdb
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-dev_secret_key_change_in_production}
+      CORS_ORIGINS: http://frontend:3000,http://localhost:3000,http://localhost:5173
+      CHROMA_PERSIST_DIRECTORY: /app/chroma_data
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - backend_chroma:/app/chroma_data
+      - ./data_warehouse:/app/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - retailmart
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: retailmart-frontend
+    environment:
+      VITE_API_URL: http://localhost:8000
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - retailmart
+    command: npm run dev -- --host
+
+volumes:
+  postgres_data:
+  backend_chroma:
+
+networks:
+  retailmart:
+    driver: bridge
