@@ -13,8 +13,8 @@ import logging
 
 from .core.config import settings
 from .core.logging import configure_logging, get_logger
-from .db import init_db, get_db_status, get_duckdb_status
-from .schemas import HealthResponse
+from .db import init_db
+from .api import chat, health
 
 # Configure logging
 configure_logging()
@@ -68,28 +68,11 @@ async def add_timing_header(request, call_next):
     return response
 
 
-# Routes
-@app.get("/health", response_model=HealthResponse)
-async def health_check():
-    """Health check endpoint"""
-    db_status = get_db_status()
-    duckdb_status = get_duckdb_status()
-
-    # Consider healthy if at least one DB is connected
-    if db_status == "disconnected" and duckdb_status == "disconnected":
-        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE)
-
-    return HealthResponse(
-        status="healthy" if db_status == "connected" else "degraded",
-        version=settings.api_version,
-        environment=settings.environment,
-        timestamp=datetime.utcnow(),
-        database=db_status,
-        duckdb=duckdb_status,
-    )
+# Include routers
+app.include_router(health.router)
+app.include_router(chat.router)
 
 
-# Include routers (will be created in phase 3/4)
 @app.get("/")
 async def root():
     """Root endpoint"""

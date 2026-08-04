@@ -94,13 +94,18 @@ class ExecutiveSummary(BaseModel):
 class ChatResponse(BaseModel):
     session_id: str
     question: str
-    intent: Optional[str]
-    sql_result: Optional[SQLResult]
-    analytics: Optional[AnalyticsResult]
-    forecasts: Optional[List[ForecastResult]]
-    recommendations: Optional[List[Recommendation]]
-    executive_summary: Optional[ExecutiveSummary]
-    response_time_ms: float
+    intent: Optional[str] = None
+    sql_result: Optional[Dict[str, Any]] = None
+    analytics: Optional[Dict[str, Any]] = None
+    forecasts: Optional[List[Dict[str, Any]]] = None
+    recommendations: Optional[List[Dict[str, Any]]] = None
+    executive_summary: Optional[Dict[str, Any]] = None
+    response_time_ms: Optional[float] = None
+
+
+class ChatException(Exception):
+    """Chat processing exception"""
+    pass
 
 
 class ReportGenerateRequest(BaseModel):
