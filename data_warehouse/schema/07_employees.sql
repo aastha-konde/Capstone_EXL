@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS employees (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_employees_department ON employees(department);
-CREATE INDEX idx_employees_region ON employees(region);
-CREATE INDEX idx_employees_attrition ON employees(attrition);
-CREATE INDEX idx_employees_performance_score ON employees(performance_score);
+CREATE INDEX IF NOT EXISTS idx_employees_department ON employees(department);
+CREATE INDEX IF NOT EXISTS idx_employees_region ON employees(region);
+CREATE INDEX IF NOT EXISTS idx_employees_attrition ON employees(attrition);
+CREATE INDEX IF NOT EXISTS idx_employees_performance_score ON employees(performance_score);

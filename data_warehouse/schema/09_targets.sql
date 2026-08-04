@@ -10,6 +10,6 @@ CREATE TABLE IF NOT EXISTS targets (
     UNIQUE(month, department)
 );
 
-CREATE INDEX idx_targets_month ON targets(month);
-CREATE INDEX idx_targets_department ON targets(department);
-CREATE INDEX idx_targets_month_department ON targets(month, department);
+CREATE INDEX IF NOT EXISTS idx_targets_month ON targets(month);
+CREATE INDEX IF NOT EXISTS idx_targets_department ON targets(department);
+CREATE INDEX IF NOT EXISTS idx_targets_month_department ON targets(month, department);

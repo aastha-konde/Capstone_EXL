@@ -17,10 +17,10 @@ CREATE TABLE IF NOT EXISTS sales (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_sales_customer_id ON sales(customer_id);
-CREATE INDEX idx_sales_product_id ON sales(product_id);
-CREATE INDEX idx_sales_order_date ON sales(order_date);
-CREATE INDEX idx_sales_region ON sales(region);
-CREATE INDEX idx_sales_warehouse ON sales(warehouse);
-CREATE INDEX idx_sales_returned ON sales(returned);
-CREATE INDEX idx_sales_order_date_region ON sales(order_date, region);
+CREATE INDEX IF NOT EXISTS idx_sales_customer_id ON sales(customer_id);
+CREATE INDEX IF NOT EXISTS idx_sales_product_id ON sales(product_id);
+CREATE INDEX IF NOT EXISTS idx_sales_order_date ON sales(order_date);
+CREATE INDEX IF NOT EXISTS idx_sales_region ON sales(region);
+CREATE INDEX IF NOT EXISTS idx_sales_warehouse ON sales(warehouse);
+CREATE INDEX IF NOT EXISTS idx_sales_returned ON sales(returned);
+CREATE INDEX IF NOT EXISTS idx_sales_order_date_region ON sales(order_date, region);

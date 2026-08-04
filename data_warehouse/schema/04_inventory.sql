@@ -12,6 +12,6 @@ CREATE TABLE IF NOT EXISTS inventory (
     UNIQUE(warehouse_id, product_id)
 );
 
-CREATE INDEX idx_inventory_product_id ON inventory(product_id);
-CREATE INDEX idx_inventory_stock_out ON inventory(stock_out);
-CREATE INDEX idx_inventory_stock_level ON inventory(stock_level);
+CREATE INDEX IF NOT EXISTS idx_inventory_product_id ON inventory(product_id);
+CREATE INDEX IF NOT EXISTS idx_inventory_stock_out ON inventory(stock_out);
+CREATE INDEX IF NOT EXISTS idx_inventory_stock_level ON inventory(stock_level);

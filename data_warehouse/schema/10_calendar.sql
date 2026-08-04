@@ -12,8 +12,8 @@ CREATE TABLE IF NOT EXISTS calendar (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_calendar_month ON calendar(month);
-CREATE INDEX idx_calendar_year ON calendar(year);
-CREATE INDEX idx_calendar_is_weekend ON calendar(is_weekend);
-CREATE INDEX idx_calendar_is_holiday ON calendar(is_holiday);
-CREATE INDEX idx_calendar_is_promotion_day ON calendar(is_promotion_day);
+CREATE INDEX IF NOT EXISTS idx_calendar_month ON calendar(month);
+CREATE INDEX IF NOT EXISTS idx_calendar_year ON calendar(year);
+CREATE INDEX IF NOT EXISTS idx_calendar_is_weekend ON calendar(is_weekend);
+CREATE INDEX IF NOT EXISTS idx_calendar_is_holiday ON calendar(is_holiday);
+CREATE INDEX IF NOT EXISTS idx_calendar_is_promotion_day ON calendar(is_promotion_day);

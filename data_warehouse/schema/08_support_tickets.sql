@@ -11,8 +11,8 @@ CREATE TABLE IF NOT EXISTS support_tickets (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_support_tickets_customer_id ON support_tickets(customer_id);
-CREATE INDEX idx_support_tickets_issue_type ON support_tickets(issue_type);
-CREATE INDEX idx_support_tickets_priority ON support_tickets(priority);
-CREATE INDEX idx_support_tickets_created_date ON support_tickets(created_date);
-CREATE INDEX idx_support_tickets_satisfaction ON support_tickets(satisfaction);
+CREATE INDEX IF NOT EXISTS idx_support_tickets_customer_id ON support_tickets(customer_id);
+CREATE INDEX IF NOT EXISTS idx_support_tickets_issue_type ON support_tickets(issue_type);
+CREATE INDEX IF NOT EXISTS idx_support_tickets_priority ON support_tickets(priority);
+CREATE INDEX IF NOT EXISTS idx_support_tickets_created_date ON support_tickets(created_date);
+CREATE INDEX IF NOT EXISTS idx_support_tickets_satisfaction ON support_tickets(satisfaction);

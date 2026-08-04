@@ -14,8 +14,8 @@ CREATE TABLE IF NOT EXISTS marketing (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_marketing_campaign_name ON marketing(campaign_name);
-CREATE INDEX idx_marketing_channel ON marketing(channel);
-CREATE INDEX idx_marketing_region ON marketing(region);
-CREATE INDEX idx_marketing_start_date ON marketing(start_date);
-CREATE INDEX idx_marketing_roi ON marketing(roi);
+CREATE INDEX IF NOT EXISTS idx_marketing_campaign_name ON marketing(campaign_name);
+CREATE INDEX IF NOT EXISTS idx_marketing_channel ON marketing(channel);
+CREATE INDEX IF NOT EXISTS idx_marketing_region ON marketing(region);
+CREATE INDEX IF NOT EXISTS idx_marketing_start_date ON marketing(start_date);
+CREATE INDEX IF NOT EXISTS idx_marketing_roi ON marketing(roi);

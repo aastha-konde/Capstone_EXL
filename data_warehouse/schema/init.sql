@@ -55,18 +55,18 @@ CREATE TABLE IF NOT EXISTS generated_reports (
     expires_at TIMESTAMP
 );
 
-CREATE INDEX idx_conversation_history_session_id ON conversation_history(session_id);
-CREATE INDEX idx_conversation_history_user_id ON conversation_history(user_id);
-CREATE INDEX idx_conversation_history_timestamp ON conversation_history(timestamp);
-CREATE INDEX idx_checkpoint_states_thread_id ON checkpoint_states(thread_id);
-CREATE INDEX idx_generated_reports_session_id ON generated_reports(session_id);
-CREATE INDEX idx_generated_reports_user_id ON generated_reports(user_id);
+CREATE INDEX IF NOT EXISTS idx_conversation_history_session_id ON conversation_history(session_id);
+CREATE INDEX IF NOT EXISTS idx_conversation_history_user_id ON conversation_history(user_id);
+CREATE INDEX IF NOT EXISTS idx_conversation_history_timestamp ON conversation_history(timestamp);
+CREATE INDEX IF NOT EXISTS idx_checkpoint_states_thread_id ON checkpoint_states(thread_id);
+CREATE INDEX IF NOT EXISTS idx_generated_reports_session_id ON generated_reports(session_id);
+CREATE INDEX IF NOT EXISTS idx_generated_reports_user_id ON generated_reports(user_id);
 
 GRANT ALL PRIVILEGES ON conversation_history TO retailmart;
 GRANT ALL PRIVILEGES ON checkpoint_states TO retailmart;
 GRANT ALL PRIVILEGES ON generated_reports TO retailmart;
-GRANT ALL PRIVILEGES ON ALL SEQUENCES ON conversation_history TO retailmart;
-GRANT ALL PRIVILEGES ON ALL SEQUENCES ON generated_reports TO retailmart;
+-- GRANT ALL PRIVILEGES ON ALL SEQUENCES ON conversation_history TO retailmart;
+-- GRANT ALL PRIVILEGES ON ALL SEQUENCES ON generated_reports TO retailmart;
 
 -- Note: Synthetic data loading is done separately by the Python loader script
 -- This schema file initializes the tables only.

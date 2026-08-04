@@ -15,8 +15,8 @@ CREATE TABLE IF NOT EXISTS customers (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_customers_segment ON customers(segment);
-CREATE INDEX idx_customers_loyalty_level ON customers(loyalty_level);
-CREATE INDEX idx_customers_state ON customers(state);
-CREATE INDEX idx_customers_income_group ON customers(income_group);
-CREATE INDEX idx_customers_joining_date ON customers(joining_date);
+CREATE INDEX IF NOT EXISTS idx_customers_segment ON customers(segment);
+CREATE INDEX IF NOT EXISTS idx_customers_loyalty_level ON customers(loyalty_level);
+CREATE INDEX IF NOT EXISTS idx_customers_state ON customers(state);
+CREATE INDEX IF NOT EXISTS idx_customers_income_group ON customers(income_group);
+CREATE INDEX IF NOT EXISTS idx_customers_joining_date ON customers(joining_date);

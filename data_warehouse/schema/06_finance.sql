@@ -13,6 +13,6 @@ CREATE TABLE IF NOT EXISTS finance (
     UNIQUE(month, department)
 );
 
-CREATE INDEX idx_finance_month ON finance(month);
-CREATE INDEX idx_finance_department ON finance(department);
-CREATE INDEX idx_finance_month_department ON finance(month, department);
+CREATE INDEX IF NOT EXISTS idx_finance_month ON finance(month);
+CREATE INDEX IF NOT EXISTS idx_finance_department ON finance(department);
+CREATE INDEX IF NOT EXISTS idx_finance_month_department ON finance(month, department);

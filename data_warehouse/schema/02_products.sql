@@ -12,9 +12,9 @@ CREATE TABLE IF NOT EXISTS products (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_products_category ON products(category);
-CREATE INDEX idx_products_subcategory ON products(subcategory);
-CREATE INDEX idx_products_brand ON products(brand);
-CREATE INDEX idx_products_supplier ON products(supplier);
-CREATE INDEX idx_products_status ON products(status);
-CREATE INDEX idx_products_launch_date ON products(launch_date);
+CREATE INDEX IF NOT EXISTS idx_products_category ON products(category);
+CREATE INDEX IF NOT EXISTS idx_products_subcategory ON products(subcategory);
+CREATE INDEX IF NOT EXISTS idx_products_brand ON products(brand);
+CREATE INDEX IF NOT EXISTS idx_products_supplier ON products(supplier);
+CREATE INDEX IF NOT EXISTS idx_products_status ON products(status);
+CREATE INDEX IF NOT EXISTS idx_products_launch_date ON products(launch_date);
