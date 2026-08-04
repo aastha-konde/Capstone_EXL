@@ -16,8 +16,6 @@ logger = get_logger(__name__)
 engine = create_engine(
     settings.postgres_url,
     poolclass=NullPool if settings.environment == 'development' else None,
-    pool_size=settings.postgres_pool_size,
-    max_overflow=settings.postgres_max_overflow,
     echo=settings.debug,
 )
 

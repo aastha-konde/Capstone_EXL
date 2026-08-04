@@ -33,7 +33,7 @@ class ConversationHistory(Base):
     question = Column(Text, nullable=False)
     response = Column(Text)
     intent = Column(String(100))
-    metadata = Column(JSON, default={})
+    metadata_json = Column("metadata", JSON, default={})
     created_at = Column(DateTime, default=datetime.utcnow, index=True)
 
 
@@ -49,7 +49,7 @@ class GeneratedReport(Base):
     file_path = Column(String(500))
     question = Column(Text)
     summary = Column(Text)
-    metadata = Column(JSON, default={})
+    metadata_json = Column("metadata",JSON, default={})
     created_at = Column(DateTime, default=datetime.utcnow, index=True)
     expires_at = Column(DateTime, nullable=True)
 
@@ -64,7 +64,7 @@ class CheckpointState(Base):
     parent_config = Column(JSON)
     config = Column(JSON)
     values = Column(JSON)
-    metadata = Column(JSON)
+    metadata_json = Column("metadata", JSON)
     created_at = Column(DateTime, default=datetime.utcnow, index=True)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
