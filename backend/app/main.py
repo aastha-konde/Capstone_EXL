@@ -14,7 +14,7 @@ import logging
 from .core.config import settings
 from .core.logging import configure_logging, get_logger
 from .db import init_db
-from .api import chat, health
+from .api import chat, health, analytics, recommendations
 
 # Configure logging
 configure_logging()
@@ -71,6 +71,8 @@ async def add_timing_header(request, call_next):
 # Include routers
 app.include_router(health.router)
 app.include_router(chat.router)
+app.include_router(analytics.router)
+app.include_router(recommendations.router)
 
 
 @app.get("/")

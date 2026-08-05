@@ -131,3 +131,50 @@ class HealthResponse(BaseModel):
     timestamp: datetime
     database: Optional[str]
     duckdb: Optional[str]
+
+
+# Analytics Schemas
+class ConfidenceInterval(BaseModel):
+    lower: float
+    upper: float
+
+
+class KPIResponse(BaseModel):
+    metric: str
+    value: float
+    unit: Optional[str] = None
+    period: Optional[str] = None
+
+
+class TrendResponse(BaseModel):
+    metric: str
+    direction: str  # 'up', 'down', 'stable'
+    percentage: float
+    period: str
+
+
+class ForecastResponse(BaseModel):
+    metric: str
+    value: float
+    confidence_interval: ConfidenceInterval
+    period: str
+    model: str
+
+
+class AnomalyResponse(BaseModel):
+    metric: str
+    value: float
+    expected: float
+    severity: str  # 'low', 'medium', 'high'
+    description: str
+
+
+class RecommendationResponse(BaseModel):
+    id: str
+    title: str
+    description: str
+    priority: str  # 'high', 'medium', 'low'
+    expected_impact: str
+    department: Optional[str] = None
+    estimated_cost: Optional[float] = None
+    estimated_savings: Optional[float] = None

@@ -1,10 +1,11 @@
 import { useState } from 'react'
-import axios from 'axios'
+import { api, ChatResponse } from '../services/api'
 
 interface Message {
   role: 'user' | 'assistant'
   content: string
   timestamp: string
+  data?: ChatResponse
 }
 
 export default function ChatPanel() {
@@ -12,6 +13,7 @@ export default function ChatPanel() {
   const [messages, setMessages] = useState<Message[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [sessionId, setSessionId] = useState<string | undefined>()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -30,49 +32,72 @@ export default function ChatPanel() {
     setError('')
 
     try {
-      const response = await axios.post(
-        'http://localhost:8000/api/chat',
-        { question },
-        { timeout: 60000 }
-      )
+      const response = await api.chat({
+        question,
+        session_id: sessionId,
+      })
 
-      const data = response.data
-
-      // Build assistant response
-      let responseText = `**Analysis Complete**\n\n`
-
-      if (data.intent) {
-        responseText += `**Intent:** ${data.intent}\n\n`
+      if (!sessionId) {
+        setSessionId(response.session_id)
       }
 
-      if (data.analytics) {
-        responseText += `**KPIs:**\n`
-        const kpis = data.analytics.kpis || {}
-        for (const [key, val] of Object.entries(kpis).slice(0, 5)) {
-          responseText += `• ${key}: ${JSON.stringify(val)}\n`
+      // Build assistant response
+      let responseText = `**Analysis Complete** (${response.response_time_ms.toFixed(0)}ms)\n\n`
+
+      if (response.intent) {
+        responseText += `**Intent:** ${response.intent}\n\n`
+      }
+
+      if (response.analytics?.kpis) {
+        responseText += `**Key Metrics:**\n`
+        const kpis = response.analytics.kpis
+        const kpiEntries = Object.entries(kpis).slice(0, 5)
+        for (const [key, val] of kpiEntries) {
+          const formatted = typeof val === 'number'
+            ? val.toLocaleString(undefined, { maximumFractionDigits: 2 })
+            : val
+          responseText += `• **${key.replace(/_/g, ' ')}:** ${formatted}\n`
         }
         responseText += '\n'
       }
 
-      if (data.recommendations && data.recommendations.length > 0) {
-        responseText += `**Recommendations:**\n`
-        data.recommendations.slice(0, 3).forEach((rec: any, i: number) => {
-          responseText += `${i+1}. ${rec.title} [${rec.priority}]\n`
+      if (response.analytics?.trends && response.analytics.trends.length > 0) {
+        responseText += `**Trends:**\n`
+        response.analytics.trends.slice(0, 3).forEach((trend) => {
+          const icon = trend.direction === 'up' ? '📈' : trend.direction === 'down' ? '📉' : '➡️'
+          responseText += `• ${trend.metric}: ${icon} ${trend.percentage > 0 ? '+' : ''}${trend.percentage.toFixed(1)}% (${trend.period})\n`
+        })
+        responseText += '\n'
+      }
+
+      if (response.forecasts && response.forecasts.length > 0) {
+        responseText += `**Forecasts:**\n`
+        response.forecasts.slice(0, 2).forEach((f) => {
+          responseText += `• ${f.metric}: ${f.value.toLocaleString(undefined, { maximumFractionDigits: 1 })} (${f.period})\n`
+        })
+        responseText += '\n'
+      }
+
+      if (response.recommendations && response.recommendations.length > 0) {
+        responseText += `**Top Recommendations:**\n`
+        response.recommendations.slice(0, 3).forEach((rec, i) => {
+          const priorityEmoji = rec.priority === 'high' ? '🔴' : rec.priority === 'medium' ? '🟡' : '🟢'
+          responseText += `${i+1}. ${priorityEmoji} **${rec.title}** [${rec.priority.toUpperCase()}]\n`
           responseText += `   Impact: ${rec.expected_impact}\n`
         })
         responseText += '\n'
       }
 
-      if (data.executive_summary) {
-        responseText += `**Summary:** ${data.executive_summary.narrative}\n`
+      if (response.executive_summary) {
+        responseText += `**Executive Summary:**\n`
+        responseText += `${response.executive_summary.narrative}\n`
       }
-
-      responseText += `\n*Response time: ${data.response_time_ms?.toFixed(2) || '?'}ms*`
 
       const assistantMessage: Message = {
         role: 'assistant',
         content: responseText,
         timestamp: new Date().toLocaleTimeString(),
+        data: response,
       }
       setMessages(prev => [...prev, assistantMessage])
 
