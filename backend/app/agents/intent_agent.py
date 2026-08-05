@@ -1,6 +1,6 @@
 """Intent Detection Agent - classify question type and required tables"""
 
-from langchain_openai import ChatOpenAI
+from langchain_google_genai import ChatGoogleGenerativeAI
 from ..core.config import settings
 from ..core.logging import get_logger
 from .state import AgentState
@@ -9,11 +9,10 @@ import json
 logger = get_logger(__name__)
 
 # Initialize LLM
-llm = ChatOpenAI(
-    model=settings.openrouter_model,
+llm = ChatGoogleGenerativeAI(
+    model=settings.gemini_model,
+    api_key=settings.gemini_api_key,
     temperature=settings.llm_temperature,
-    openai_api_key=settings.openrouter_api_key,
-    openai_api_base=settings.openrouter_base_url,
 )
 
 
@@ -44,17 +43,35 @@ Intent types:
 Respond only with valid JSON."""
 
         response = await llm.ainvoke(prompt)
-        result = json.loads(response.content)
+
+        # Handle both string and list responses from Gemini
+        if isinstance(response.content, list):
+            # Gemini returns list of content blocks
+            content = response.content[0]['text'] if response.content else ""
+        else:
+            content = response.content
+
+        content = content.strip()
+
+        # Remove markdown JSON backticks if present
+        content = content.replace("```json", "").replace("```", "").strip()
+
+        result = json.loads(content)
 
         state.intent = result.get("intent", "diagnostic")
         state.required_tables = result.get("required_tables", [])
 
         logger.info(f"Intent detected: {state.intent}, tables: {state.required_tables}")
 
+    except json.JSONDecodeError as e:
+        logger.error(f"Intent agent JSON error: {e}")
+        # Fallback
+        state.intent = "diagnostic"
+        state.required_tables = ["sales", "customers", "products"]
     except Exception as e:
         logger.error(f"Intent agent error: {e}")
         state.errors.append(f"Intent detection failed: {str(e)}")
-        state.intent = "diagnostic"  # Default fallback
-        state.required_tables = ["sales", "customers", "products"]  # Common fallback
+        state.intent = "diagnostic"
+        state.required_tables = ["sales", "customers", "products"]
 
     return state

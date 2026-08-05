@@ -1,6 +1,6 @@
 """Recommendation Agent - suggest actions based on analysis"""
 
-from langchain_openai import ChatOpenAI
+from langchain_google_genai import ChatGoogleGenerativeAI
 from ..core.config import settings
 from ..core.logging import get_logger
 from .state import AgentState
@@ -8,11 +8,10 @@ import json
 
 logger = get_logger(__name__)
 
-llm = ChatOpenAI(
-    model=settings.openrouter_model,
+llm = ChatGoogleGenerativeAI(
+    model=settings.gemini_model,
+    api_key=settings.gemini_api_key,
     temperature=settings.llm_temperature,
-    openai_api_key=settings.openrouter_api_key,
-    openai_api_base=settings.openrouter_base_url,
 )
 
 
@@ -100,7 +99,14 @@ Provide realistic, data-backed recommendations."""
 
             try:
                 response = await llm.ainvoke(prompt)
-                content = response.content.strip()
+
+                # Handle both string and list responses from Gemini
+                if isinstance(response.content, list):
+                    content = response.content[0]['text'] if response.content else ""
+                else:
+                    content = response.content
+
+                content = content.strip()
 
                 # Extract JSON from response
                 start_idx = content.find("[")

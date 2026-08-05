@@ -1,6 +1,6 @@
 """SQL Agent - convert NL to SQL and execute on DuckDB"""
 
-from langchain_openai import ChatOpenAI
+from langchain_google_genai import ChatGoogleGenerativeAI
 import duckdb
 from ..core.config import settings
 from ..core.logging import get_logger
@@ -10,11 +10,10 @@ import re
 
 logger = get_logger(__name__)
 
-llm = ChatOpenAI(
-    model=settings.openrouter_model,
-    temperature=0.2,  # Lower temp for SQL (more deterministic)
-    openai_api_key=settings.openrouter_api_key,
-    openai_api_base=settings.openrouter_base_url,
+llm = ChatGoogleGenerativeAI(
+    model=settings.gemini_model,
+    api_key=settings.gemini_api_key,
+    temperature=0.2,
 )
 
 # Database schema
@@ -65,7 +64,14 @@ Question: {state.question}
 Generate a single SQL SELECT query that answers the question. Respond with ONLY the SQL query, no explanation."""
 
         response = await llm.ainvoke(prompt)
-        sql_query = response.content.strip()
+
+        # Handle both string and list responses from Gemini
+        if isinstance(response.content, list):
+            sql_query = response.content[0]['text'] if response.content else ""
+        else:
+            sql_query = response.content
+
+        sql_query = sql_query.strip()
 
         # Clean up response (LLM might add markdown backticks)
         sql_query = sql_query.replace("```sql", "").replace("```", "").strip()
@@ -82,7 +88,9 @@ Generate a single SQL SELECT query that answers the question. Respond with ONLY 
         state.sql_query = sql_query
 
         # Execute on DuckDB
-        conn = duckdb.connect(settings.duckdb_path, read_only=True)
+        db_path = settings.resolved_duckdb_path
+        logger.debug(f"Connecting to DuckDB at: {db_path}")
+        conn = duckdb.connect(db_path, read_only=True)
         try:
             result = conn.execute(sql_query).fetchall()
             columns = [desc[0] for desc in conn.description] if conn.description else []

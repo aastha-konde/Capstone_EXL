@@ -26,7 +26,7 @@ async def test_simple_question():
 
     print(f"\n📝 Question: {question}")
     print(f"🔄 Session: {session_id}")
-    print(f"🤖 LLM Model: {settings.openrouter_model}")
+    print(f"🤖 LLM Model: {settings.anthropic_model}")
 
     try:
         print("\n⏳ Running agent pipeline...")
@@ -112,7 +112,7 @@ async def main():
     print(f"   Environment: {settings.environment}")
     print(f"   Debug Mode: {settings.debug}")
     print(f"   LLM Provider: OpenRouter")
-    print(f"   LLM Model: {settings.openrouter_model}")
+    print(f"   LLM Model: {settings.anthropic_model}")
     print(f"   DuckDB Path: {settings.duckdb_path}")
 
     # Test 1: Simple question

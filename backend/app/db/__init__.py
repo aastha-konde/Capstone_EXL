@@ -29,7 +29,9 @@ _duckdb_local = threading.local()
 def get_duckdb_conn():
     """Get or create a thread-local DuckDB connection"""
     if not hasattr(_duckdb_local, 'conn') or _duckdb_local.conn is None:
-        _duckdb_local.conn = duckdb.connect(settings.duckdb_path, read_only=False)
+        path = settings.resolved_duckdb_path
+        logger.debug(f"Connecting to DuckDB: {path}")
+        _duckdb_local.conn = duckdb.connect(path, read_only=False)
     return _duckdb_local.conn
 
 
@@ -49,8 +51,8 @@ def init_db():
         Base.metadata.create_all(bind=engine)
         logger.info("Database tables initialized")
     except Exception as e:
-        logger.error(f"Failed to initialize database: {e}")
-        raise
+        logger.warning(f"Database initialization failed (non-blocking): {str(e)[:100]}")
+        # Don't raise - PostgreSQL is optional, DuckDB is primary
 
 
 def get_db_status():
@@ -60,7 +62,7 @@ def get_db_status():
             conn.execute("SELECT 1")
         return "connected"
     except Exception as e:
-        logger.error(f"Database connection failed: {e}")
+        logger.warning(f"PostgreSQL unavailable: {str(e)[:50]}")
         return "disconnected"
 
 

@@ -2,6 +2,8 @@
 
 from pydantic_settings import BaseSettings
 from typing import Optional
+from pathlib import Path
+import os
 
 
 class Settings(BaseSettings):
@@ -17,10 +19,10 @@ class Settings(BaseSettings):
     api_version: str = "1.0.0"
     api_description: str = "Enterprise Decision Intelligence Platform"
 
-    # LLM Configuration (OpenRouter)
-    openrouter_api_key: str
-    openrouter_model: str = "qwen/qwen-2.5-72b-instruct"
-    openrouter_base_url: str = "https://openrouter.ai/api/v1"
+    # LLM Configuration (Google Gemini API)
+    llm_provider: str = "gemini"
+    gemini_api_key: Optional[str] = None
+    gemini_model: str = "gemini-3.5-flash"
     llm_temperature: float = 0.7
     llm_timeout: int = 60
 
@@ -34,7 +36,23 @@ class Settings(BaseSettings):
     postgres_max_overflow: int = 20
 
     # DuckDB Configuration
-    duckdb_path: str = "./data_warehouse/retailmart.duckdb"
+    duckdb_path: str = ""
+
+    @property
+    def resolved_duckdb_path(self) -> str:
+        """Resolve DuckDB path - support both relative and absolute paths"""
+        if not self.duckdb_path or self.duckdb_path == "":
+            # Default to project root/data_warehouse/retailmart.duckdb
+            project_root = Path(__file__).parent.parent.parent.parent
+            return str(project_root / "data_warehouse" / "retailmart.duckdb")
+
+        path = Path(self.duckdb_path)
+        if path.is_absolute():
+            return str(path)
+
+        # If relative, resolve from project root
+        project_root = Path(__file__).parent.parent.parent.parent
+        return str(project_root / self.duckdb_path)
 
     # JWT Configuration
     jwt_secret_key: str = "your_secret_key_change_in_production"
@@ -60,9 +78,21 @@ class Settings(BaseSettings):
     enable_forecasting: bool = True
     enable_anomaly_detection: bool = True
 
+    # Frontend Configuration
+    vite_api_url: str = "http://localhost:8000"
+    vite_api_timeout: int = 30000
+
+    # Email Configuration
+    smtp_server: Optional[str] = None
+    smtp_port: int = 587
+    smtp_username: Optional[str] = None
+    smtp_password: Optional[str] = None
+    report_delivery_email: Optional[str] = None
+
     class Config:
-        env_file = ".env"
+        env_file = str(Path(__file__).parent.parent.parent.parent / ".env")
         case_sensitive = False
+        extra = "ignore"
 
     @property
     def postgres_url(self) -> str:
