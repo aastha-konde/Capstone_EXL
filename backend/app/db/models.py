@@ -33,7 +33,7 @@ class ConversationHistory(Base):
     question = Column(Text, nullable=False)
     response = Column(Text)
     intent = Column(String(100))
-    metadata_json = Column("metadata", JSON, default={})
+    metadata_info = Column("metadata", JSON, default={})  # Column name in DB is "metadata", Python attr is "metadata_info"
     created_at = Column(DateTime, default=datetime.utcnow, index=True)
 
 

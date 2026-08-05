@@ -147,8 +147,14 @@ export default function ChatPanel() {
             )}
             {loading && (
               <div className="flex justify-start">
-                <div className="bg-gray-200 dark:bg-gray-700 px-4 py-2 rounded-lg">
-                  <p className="text-sm text-gray-700 dark:text-gray-300">🤔 Analyzing...</p>
+                <div className="bg-gray-200 dark:bg-gray-700 px-4 py-3 rounded-lg max-w-sm">
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg">🤔</span>
+                    <div>
+                      <p className="text-sm text-gray-700 dark:text-gray-300 font-semibold">Analyzing your question...</p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">This may take up to 2 minutes (Running agent pipeline)</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}

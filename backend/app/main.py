@@ -26,7 +26,10 @@ async def lifespan(app: FastAPI):
     """Application startup and shutdown"""
     logger.info("Starting DecisionLens AI application")
     try:
-        init_db()
+        # Initialize DB in background to avoid blocking startup
+        import threading
+        db_thread = threading.Thread(target=init_db, daemon=True)
+        db_thread.start()
     except Exception as e:
         logger.error(f"Failed to initialize database: {e}")
 
@@ -48,6 +51,7 @@ app = FastAPI(
 
 # Add CORS middleware
 cors_origins = [origin.strip() for origin in settings.cors_origins.split(',')]
+print("CORS ORIGINS:", cors_origins)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=cors_origins,

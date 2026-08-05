@@ -43,7 +43,7 @@ class Settings(BaseSettings):
     jwt_refresh_expiration_days: int = 30
 
     # Security
-    cors_origins: str = "http://localhost:3000,http://localhost:5173"
+    cors_origins: str = "http://localhost:3000,http://localhost:3001,http://localhost:5173"
     allowed_hosts: str = "localhost,127.0.0.1"
 
     # Chroma RAG

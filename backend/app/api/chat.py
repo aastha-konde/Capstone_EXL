@@ -40,18 +40,22 @@ async def chat(
         )
 
         # Save conversation to database
-        conversation = ConversationHistory(
-            session_id=uuid.UUID(session_id) if len(session_id) == 36 else uuid.uuid4(),
-            question=request.question,
-            intent=agent_state.intent,
-            metadata={
-                "sql_query": agent_state.sql_query,
-                "error_count": len(agent_state.errors),
-                "response_time_ms": agent_state.total_time_ms,
-            },
-        )
-        db.add(conversation)
-        db.commit()
+        try:
+            conversation = ConversationHistory(
+                session_id=uuid.UUID(session_id) if len(session_id) == 36 else uuid.uuid4(),
+                question=request.question,
+                intent=agent_state.intent,
+                metadata_info={
+                    "sql_query": agent_state.sql_query,
+                    "error_count": len(agent_state.errors),
+                    "response_time_ms": agent_state.total_time_ms,
+                },
+            )
+            db.add(conversation)
+            db.commit()
+        except Exception as e:
+            logger.warning(f"Failed to save conversation history: {e}")
+            db.rollback()
 
         # Build response
         response = ChatResponse(
