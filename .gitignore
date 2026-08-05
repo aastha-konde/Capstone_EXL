@@ -82,3 +82,6 @@ frontend/build/
 *.log
 temp/
 tmp/
+
+.env
+*.env

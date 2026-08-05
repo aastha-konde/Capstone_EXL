@@ -73,7 +73,7 @@ You can change the model in `.env` (ANTHROPIC_MODEL):
 
 Your current setup:
 ```
-ANTHROPIC_API_KEY=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
+ANTHROPIC_API_KEY=
 ANTHROPIC_MODEL=claude-3-5-sonnet-20241022
 ```
 
