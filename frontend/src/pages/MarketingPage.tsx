@@ -103,7 +103,10 @@ export default function MarketingPage() {
         <div className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-6">
           <h2 className="text-lg font-semibold text-slate-100 mb-4">ROI by Channel</h2>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={data.by_channel}>
+            <BarChart
+              data={data.by_channel}
+              margin={{ top: 20, right: 30, left: 0, bottom: 5 }}
+            >
               <CartesianGrid strokeDasharray="3 3" stroke="#475569" />
               <XAxis dataKey="channel" stroke="#94A3B8" />
               <YAxis stroke="#94A3B8" />
@@ -120,10 +123,14 @@ export default function MarketingPage() {
         <div className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-6">
           <h2 className="text-lg font-semibold text-slate-100 mb-4">Spend & Conversions Trend</h2>
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={data.trends}>
+            <LineChart
+              data={data.trends}
+              margin={{ top: 20, right: 30, left: 0, bottom: 5 }}
+            >
               <CartesianGrid strokeDasharray="3 3" stroke="#475569" />
               <XAxis dataKey="month" stroke="#94A3B8" />
-              <YAxis stroke="#94A3B8" />
+              <YAxis yAxisId="left" stroke="#94A3B8" />
+              <YAxis yAxisId="right" orientation="right" stroke="#94A3B8" />
               <Tooltip
                 contentStyle={{ backgroundColor: '#1E293B', border: '1px solid #475569' }}
                 labelStyle={{ color: '#E2E8F0' }}
@@ -135,6 +142,7 @@ export default function MarketingPage() {
                 stroke="#3B82F6"
                 yAxisId="left"
                 name="Spend ($K)"
+                strokeWidth={2}
               />
               <Line
                 type="monotone"
@@ -142,6 +150,7 @@ export default function MarketingPage() {
                 stroke="#10B981"
                 yAxisId="right"
                 name="Conversions"
+                strokeWidth={2}
               />
             </LineChart>
           </ResponsiveContainer>
@@ -173,14 +182,15 @@ export default function MarketingPage() {
         <div className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-6">
           <h2 className="text-lg font-semibold text-slate-100 mb-4">Spend by Channel</h2>
           <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
+            <PieChart margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
               <Pie
                 data={data.by_channel}
                 dataKey="spend"
                 nameKey="channel"
                 cx="50%"
                 cy="50%"
-                outerRadius={100}
+                outerRadius={80}
+                label
               >
                 {data.by_channel.map((_, idx) => (
                   <Cell key={`cell-${idx}`} fill={COLORS[idx % COLORS.length]} />
