@@ -30,6 +30,7 @@ langchain-anthropic
 langgraph
 langgraph-checkpoint
 langgraph-checkpoint-postgres
+langchain-google-genai 
 
 # ML & Analytics
 scikit-learn==1.5.2

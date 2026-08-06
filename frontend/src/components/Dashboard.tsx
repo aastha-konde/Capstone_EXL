@@ -155,7 +155,7 @@ function StatCard({
   color = 'blue',
 }: {
   title: string
-  value: string
+  value?: string
   icon: string
   color?: string
 }) {
@@ -169,7 +169,7 @@ function StatCard({
     <div className={`border rounded-lg p-6 ${colorClasses[color as keyof typeof colorClasses]}`}>
       <p className="text-4xl mb-2">{icon}</p>
       <p className="text-sm font-semibold opacity-75">{title}</p>
-      <p className="text-2xl font-bold mt-2">{value}</p>
+      <p className="text-2xl font-bold mt-2">{value || 'N/A'}</p>
     </div>
   )
 }
