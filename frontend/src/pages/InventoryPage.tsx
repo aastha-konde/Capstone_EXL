@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts'
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 
 interface InventoryData {
   total_value: number
@@ -8,7 +8,7 @@ interface InventoryData {
   turnover_rate: number
   by_product: { product: string; quantity: number; reorder_point: number; value: number; status: string }[]
   warehouse: { warehouse: string; total_items: number; value: number; utilization: number }[]
-  trends: { month: string; quantity: number; value: number; turnover: number }[]
+  by_category: { category: string; items: number; low_stock: number; value: number }[]
 }
 
 export default function InventoryPage() {
@@ -99,35 +99,22 @@ export default function InventoryPage() {
 
       {/* Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Inventory Trends */}
+        {/* Stock Health by Category */}
         <div className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-6">
-          <h2 className="text-lg font-semibold text-slate-100 mb-4">Inventory Trends</h2>
+          <h2 className="text-lg font-semibold text-slate-100 mb-4">Stock Health by Category</h2>
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={data.trends}>
+            <BarChart data={data.by_category}>
               <CartesianGrid strokeDasharray="3 3" stroke="#475569" />
-              <XAxis dataKey="month" stroke="#94A3B8" />
-              <YAxis yAxisId="left" stroke="#94A3B8" />
-              <YAxis yAxisId="right" orientation="right" stroke="#94A3B8" />
+              <XAxis dataKey="category" stroke="#94A3B8" />
+              <YAxis stroke="#94A3B8" />
               <Tooltip
                 contentStyle={{ backgroundColor: '#1E293B', border: '1px solid #475569' }}
                 labelStyle={{ color: '#E2E8F0' }}
               />
               <Legend />
-              <Line
-                yAxisId="left"
-                type="monotone"
-                dataKey="quantity"
-                stroke="#3B82F6"
-                name="Quantity"
-              />
-              <Line
-                yAxisId="right"
-                type="monotone"
-                dataKey="value"
-                stroke="#10B981"
-                name="Value ($K)"
-              />
-            </LineChart>
+              <Bar dataKey="items" fill="#3B82F6" radius={[8, 8, 0, 0]} name="Total Items" />
+              <Bar dataKey="low_stock" fill="#EF4444" radius={[8, 8, 0, 0]} name="Low Stock" />
+            </BarChart>
           </ResponsiveContainer>
         </div>
 

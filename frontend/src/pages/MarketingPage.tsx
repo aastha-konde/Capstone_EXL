@@ -3,7 +3,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 
 interface MarketingData {
   total_spend: number
-  total_impressions: number
+  total_clicks: number
   total_conversions: number
   avg_roi: number
   by_channel: { channel: string; spend: number; roi: number; conversions: number }[]
@@ -76,9 +76,9 @@ export default function MarketingPage() {
         </div>
 
         <div className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-6">
-          <div className="text-slate-400 text-sm font-medium">Impressions</div>
+          <div className="text-slate-400 text-sm font-medium">Clicks</div>
           <div className="text-3xl font-bold text-purple-400 mt-2">
-            {(data.total_impressions / 1000000).toFixed(1)}M
+            {(data.total_clicks / 1000).toFixed(1)}K
           </div>
         </div>
 

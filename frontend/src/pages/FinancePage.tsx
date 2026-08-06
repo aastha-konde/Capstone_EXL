@@ -7,8 +7,7 @@ interface FinanceData {
   total_profit: number
   profit_margin: number
   trends: { month: string; revenue: number; cost: number; profit: number }[]
-  by_region: { region: string; revenue: number; cost: number; profit: number }[]
-  by_category: { category: string; revenue: number; profit: number }[]
+  by_department: { department: string; revenue: number; cost: number; profit: number }[]
 }
 
 export default function FinancePage() {
@@ -154,33 +153,33 @@ export default function FinancePage() {
         </div>
       </div>
 
-      {/* Regional & Category Breakdown */}
+      {/* Department Breakdown */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* By Region */}
+        {/* By Department (list) */}
         <div className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-6">
-          <h2 className="text-lg font-semibold text-slate-100 mb-4">Financial Performance by Region</h2>
+          <h2 className="text-lg font-semibold text-slate-100 mb-4">Financial Performance by Department</h2>
           <div className="space-y-4">
-            {data.by_region.map((region, idx) => (
+            {data.by_department.map((dept, idx) => (
               <div key={idx} className="border border-slate-700/30 rounded-lg p-4">
                 <div className="flex justify-between items-center mb-2">
-                  <p className="font-semibold text-slate-100">{region.region}</p>
+                  <p className="font-semibold text-slate-100">{dept.department}</p>
                   <p className="text-sm text-green-400 font-medium">
-                    ${(region.profit / 1000).toFixed(0)}K profit
+                    ${(dept.profit / 1000).toFixed(0)}K profit
                   </p>
                 </div>
                 <div className="grid grid-cols-3 gap-2 text-xs">
                   <div>
                     <p className="text-slate-500">Revenue</p>
-                    <p className="text-slate-100 font-semibold">${(region.revenue / 1000).toFixed(0)}K</p>
+                    <p className="text-slate-100 font-semibold">${(dept.revenue / 1000).toFixed(0)}K</p>
                   </div>
                   <div>
                     <p className="text-slate-500">Cost</p>
-                    <p className="text-slate-100 font-semibold">${(region.cost / 1000).toFixed(0)}K</p>
+                    <p className="text-slate-100 font-semibold">${(dept.cost / 1000).toFixed(0)}K</p>
                   </div>
                   <div>
                     <p className="text-slate-500">Margin</p>
                     <p className="text-slate-100 font-semibold">
-                      {((region.profit / region.revenue) * 100).toFixed(1)}%
+                      {dept.revenue > 0 ? ((dept.profit / dept.revenue) * 100).toFixed(1) : '0.0'}%
                     </p>
                   </div>
                 </div>
@@ -189,13 +188,13 @@ export default function FinancePage() {
           </div>
         </div>
 
-        {/* By Category */}
+        {/* By Department (chart) */}
         <div className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-6">
-          <h2 className="text-lg font-semibold text-slate-100 mb-4">Profitability by Category</h2>
+          <h2 className="text-lg font-semibold text-slate-100 mb-4">Revenue & Profit by Department</h2>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={data.by_category}>
+            <BarChart data={data.by_department}>
               <CartesianGrid strokeDasharray="3 3" stroke="#475569" />
-              <XAxis dataKey="category" stroke="#94A3B8" />
+              <XAxis dataKey="department" stroke="#94A3B8" />
               <YAxis stroke="#94A3B8" />
               <Tooltip
                 contentStyle={{ backgroundColor: '#1E293B', border: '1px solid #475569' }}

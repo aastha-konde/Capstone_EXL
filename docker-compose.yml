@@ -14,7 +14,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./data_warehouse/schema:/docker-entrypoint-initdb.d
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-retailmart}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-retailmart} -d ${POSTGRES_DB:-retailmart_dw}"]
       interval: 10s
       timeout: 5s
       retries: 5
