@@ -1,7 +1,7 @@
 """Database connections and session management"""
 
 import duckdb
-from sqlalchemy import create_engine, event
+from sqlalchemy import create_engine, event, text
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.pool import NullPool
 import threading
@@ -59,7 +59,7 @@ def get_db_status():
     """Check database connectivity"""
     try:
         with engine.connect() as conn:
-            conn.execute("SELECT 1")
+            conn.execute(text("SELECT 1"))
         return "connected"
     except Exception as e:
         logger.warning(f"PostgreSQL unavailable: {str(e)[:50]}")

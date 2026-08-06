@@ -29,6 +29,7 @@ CREATE TABLE IF NOT EXISTS conversation_history (
     response TEXT,
     intent VARCHAR(100),
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     metadata JSONB
 );
 
