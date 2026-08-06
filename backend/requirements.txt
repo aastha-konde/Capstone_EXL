@@ -62,3 +62,5 @@ structlog==24.4.0
 pytest==7.4.4
 pytest-asyncio==0.23.3
 httpx==0.25.2
+langchain-google-genai
+

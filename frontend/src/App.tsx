@@ -1,76 +1,44 @@
-import { useState } from 'react'
-import './App.css'
+import { useState, useEffect } from 'react'
+import Header from './components/Header'
+import Sidebar from './components/Sidebar'
 import ChatPanel from './components/ChatPanel'
 import Dashboard from './components/Dashboard'
 
 function App() {
-  const [activeTab, setActiveTab] = useState('chat')
-  const [darkMode, setDarkMode] = useState(false)
+  const [activeTab, setActiveTab] = useState('dashboard')
+  const [darkMode, setDarkMode] = useState(true)
+
+  useEffect(() => {
+    // Ensure dark mode is always on
+    if (darkMode) {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+  }, [darkMode])
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'chat':
+        return <ChatPanel />
+      case 'dashboard':
+      default:
+        return <Dashboard />
+    }
+  }
 
   return (
-    <div className={darkMode ? 'dark' : ''}>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        {/* Header */}
-        <header className="bg-white dark:bg-gray-800 shadow">
-          <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center">
-              <div>
-                <h1 className="text-3xl font-bold text-primary dark:text-blue-400">
-                  DecisionLens AI
-                </h1>
-                <p className="text-gray-600 dark:text-gray-400 text-sm">
-                  Enterprise Decision Intelligence Platform
-                </p>
-              </div>
-              <button
-                onClick={() => setDarkMode(!darkMode)}
-                className="px-4 py-2 rounded-md bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white hover:bg-gray-300 dark:hover:bg-gray-600"
-              >
-                {darkMode ? '☀️ Light' : '🌙 Dark'}
-              </button>
-            </div>
-          </div>
-        </header>
+    <div className="dark bg-slate-900 text-slate-100 min-h-screen">
+      <Header darkMode={darkMode} onThemeChange={setDarkMode} />
 
-        {/* Navigation */}
-        <nav className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex space-x-8">
-              <button
-                onClick={() => setActiveTab('chat')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === 'chat'
-                    ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300'
-                }`}
-              >
-                💬 Chat
-              </button>
-              <button
-                onClick={() => setActiveTab('dashboard')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === 'dashboard'
-                    ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300'
-                }`}
-              >
-                📊 Dashboard
-              </button>
-            </div>
-          </div>
-        </nav>
+      <div className="flex">
+        <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
 
-        {/* Main Content */}
-        <main className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-          {activeTab === 'chat' ? <ChatPanel /> : <Dashboard />}
+        <main className="flex-1 overflow-auto h-[calc(100vh-64px)]">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            {renderContent()}
+          </div>
         </main>
-
-        {/* Footer */}
-        <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-12">
-          <div className="max-w-7xl mx-auto px-4 py-6 text-center text-gray-600 dark:text-gray-400 text-sm">
-            <p>DecisionLens AI v1.0.0 | Powered by LangGraph & FastAPI</p>
-          </div>
-        </footer>
       </div>
     </div>
   )
