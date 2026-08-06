@@ -13,7 +13,6 @@ def get_chroma_client():
     try:
         client = PersistentClient(
             path=settings.chroma_persist_directory,
-            anonymized_telemetry=settings.chroma_anonymized_telemetry,
         )
         return client
     except Exception as e:

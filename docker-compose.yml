@@ -49,6 +49,7 @@ services:
       - ./backend:/app
       - backend_chroma:/app/chroma_data
       - ./data_warehouse:/app/data
+      - ./rag_documents:/app/rag_documents
     depends_on:
       postgres:
         condition: service_healthy

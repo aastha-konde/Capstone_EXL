@@ -15,6 +15,7 @@ from .core.config import settings
 from .core.logging import configure_logging, get_logger
 from .db import init_db
 from .api import chat, health, analytics, recommendations
+from .rag import ingest_documents, load_all_documents
 
 # Configure logging
 configure_logging()
@@ -30,8 +31,20 @@ async def lifespan(app: FastAPI):
         import threading
         db_thread = threading.Thread(target=init_db, daemon=True)
         db_thread.start()
+
+        # Initialize RAG with documents
+        if settings.enable_rag:
+            try:
+                documents = load_all_documents()
+                if documents:
+                    ingest_documents(documents)
+                    logger.info(f"✓ RAG system initialized with {len(documents)} documents")
+                else:
+                    logger.warning("No documents found for RAG initialization")
+            except Exception as e:
+                logger.warning(f"RAG initialization failed (non-blocking): {e}")
     except Exception as e:
-        logger.error(f"Failed to initialize database: {e}")
+        logger.error(f"Failed to initialize application: {e}")
 
     yield
 

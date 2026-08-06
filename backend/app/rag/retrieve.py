@@ -20,7 +20,6 @@ def retrieve_relevant_context(
     try:
         client = PersistentClient(
             path=settings.chroma_persist_directory,
-            anonymized_telemetry=settings.chroma_anonymized_telemetry,
         )
 
         collection = client.get_collection(name=collection_name)
