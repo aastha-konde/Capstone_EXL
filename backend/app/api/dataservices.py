@@ -1,6 +1,6 @@
 """Data service endpoints for business analytics"""
 
-from fastapi import APIRouter, Query, HTTPException, status
+from fastapi import APIRouter, Query, HTTPException, status, Depends
 from typing import Optional
 from sqlalchemy.orm import Session
 from sqlalchemy import text
@@ -13,7 +13,7 @@ router = APIRouter(prefix="/api", tags=["data-services"])
 
 
 @router.get("/sales")
-async def get_sales(db: Session = next(get_db())):
+async def get_sales(db: Session = Depends(get_db)):
     """
     Get sales analytics data including revenue, orders, and trends.
     """
@@ -99,7 +99,7 @@ async def get_sales(db: Session = next(get_db())):
 
 
 @router.get("/finance")
-async def get_finance(db: Session = next(get_db())):
+async def get_finance(db: Session = Depends(get_db)):
     """
     Get financial analytics including revenue, costs, and profit.
     """
@@ -178,7 +178,7 @@ async def get_finance(db: Session = next(get_db())):
 
 
 @router.get("/marketing")
-async def get_marketing(db: Session = next(get_db())):
+async def get_marketing(db: Session = Depends(get_db)):
     """
     Get marketing analytics including campaigns, spend, and ROI.
     """
@@ -262,7 +262,7 @@ async def get_marketing(db: Session = next(get_db())):
 
 
 @router.get("/inventory")
-async def get_inventory(db: Session = next(get_db())):
+async def get_inventory(db: Session = Depends(get_db)):
     """
     Get inventory analytics including stock levels and warehouse status.
     """
