@@ -13,6 +13,12 @@ import duckdb
 import json
 import logging
 from datetime import datetime
+from dotenv import load_dotenv
+
+# Load variables from the project's .env file (if present) without
+# overriding any that are already set in the shell environment.
+ENV_PATH = Path(__file__).parent.parent.parent / '.env'
+load_dotenv(dotenv_path=ENV_PATH)
 
 logging.basicConfig(
     level=logging.INFO,
@@ -20,9 +26,12 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Load config from environment
+# Load config from environment.
+# NOTE: Docker Compose maps the Postgres container's 5432 to host port
+# 5433 (see docker-compose.yml: "5433:5432"), so the default here must
+# be 5433 to match a Dockerized Postgres accessed from the host.
 POSTGRES_HOST = os.getenv('POSTGRES_HOST', 'localhost')
-POSTGRES_PORT = int(os.getenv('POSTGRES_PORT', 5432))
+POSTGRES_PORT = int(os.getenv('POSTGRES_PORT', 5433))
 POSTGRES_USER = os.getenv('POSTGRES_USER', 'retailmart')
 POSTGRES_PASSWORD = os.getenv('POSTGRES_PASSWORD', 'retailmart_secure_pw')
 POSTGRES_DB = os.getenv('POSTGRES_DB', 'retailmart_dw')
