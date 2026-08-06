@@ -1,5 +1,5 @@
 """API routers"""
 
-from . import chat, health, analytics, recommendations
+from . import chat, health, analytics, recommendations, dataservices
 
-__all__ = ['chat', 'health', 'analytics', 'recommendations']
+__all__ = ['chat', 'health', 'analytics', 'recommendations', 'dataservices']

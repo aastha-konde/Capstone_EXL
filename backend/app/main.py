@@ -14,7 +14,7 @@ import logging
 from .core.config import settings
 from .core.logging import configure_logging, get_logger
 from .db import init_db
-from .api import chat, health, analytics, recommendations
+from .api import chat, health, analytics, recommendations, dataservices
 from .rag import ingest_documents, load_all_documents
 
 # Configure logging
@@ -90,6 +90,7 @@ app.include_router(health.router)
 app.include_router(chat.router)
 app.include_router(analytics.router)
 app.include_router(recommendations.router)
+app.include_router(dataservices.router)
 
 
 @app.get("/")

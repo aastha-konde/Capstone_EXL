@@ -3,6 +3,14 @@ import Header from './components/Header'
 import Sidebar from './components/Sidebar'
 import ChatPanel from './components/ChatPanel'
 import Dashboard from './components/Dashboard'
+import SalesPage from './pages/SalesPage'
+import FinancePage from './pages/FinancePage'
+import MarketingPage from './pages/MarketingPage'
+import InventoryPage from './pages/InventoryPage'
+import ForecastsPage from './pages/ForecastsPage'
+import RecommendationsPage from './pages/RecommendationsPage'
+import ReportsPage from './pages/ReportsPage'
+import SettingsPage from './pages/SettingsPage'
 
 function App() {
   const [activeTab, setActiveTab] = useState('dashboard')
@@ -21,6 +29,22 @@ function App() {
     switch (activeTab) {
       case 'chat':
         return <ChatPanel />
+      case 'sales':
+        return <SalesPage />
+      case 'finance':
+        return <FinancePage />
+      case 'marketing':
+        return <MarketingPage />
+      case 'inventory':
+        return <InventoryPage />
+      case 'forecasts':
+        return <ForecastsPage />
+      case 'recommendations':
+        return <RecommendationsPage />
+      case 'reports':
+        return <ReportsPage />
+      case 'settings':
+        return <SettingsPage />
       case 'dashboard':
       default:
         return <Dashboard />
