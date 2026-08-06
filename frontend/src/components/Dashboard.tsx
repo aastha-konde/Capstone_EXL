@@ -1,13 +1,10 @@
-import { useEffect, useState } from 'react'
-import { api, StatusResponse } from '../services/api'
-import KPIPanel from './KPIPanel'
-import TrendsPanel from './TrendsPanel'
-import ForecastPanel from './ForecastPanel'
-import AnomalyPanel from './AnomalyPanel'
-import RecommendationPanel from './RecommendationPanel'
+import { useState, useEffect } from 'react'
+import { api } from '../services/api'
+import KPICards from './KPICards'
+import { SkeletonCard } from './Skeleton'
 
 export default function Dashboard() {
-  const [status, setStatus] = useState<StatusResponse | null>(null)
+  const [status, setStatus] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -22,176 +19,135 @@ export default function Dashboard() {
       const data = await api.getStatus()
       setStatus(data)
     } catch (err: any) {
-      setError(err.response?.data?.detail || err.message || 'Failed to fetch status')
-      console.error('Failed to fetch status:', err)
+      setError(err.message || 'Failed to fetch dashboard status')
+      console.error('Dashboard Error:', err)
     } finally {
       setLoading(false)
     }
   }
 
-  if (loading) {
-    return <div className="text-center py-8 text-gray-500">Loading dashboard...</div>
-  }
-
-  if (error) {
-    return (
-      <div className="bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded-lg p-4">
-        <p className="text-red-800 dark:text-red-100">Error: {error}</p>
-        <button
-          onClick={fetchStatus}
-          className="mt-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-        >
-          Retry
-        </button>
-      </div>
-    )
-  }
-
   return (
-    <div className="space-y-6">
-      {/* System Status Cards */}
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">System Status</h2>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <StatCard
-            title="System Status"
-            value={status?.app}
-            icon="🚀"
-          />
-          <StatCard
-            title="Version"
-            value={status?.version}
-            icon="📦"
-          />
-          <StatCard
-            title="Database"
-            value={status?.database}
-            icon="💾"
-            color={status?.database === 'connected' ? 'green' : 'red'}
-          />
-          <StatCard
-            title="DuckDB"
-            value={status?.duckdb}
-            icon="⚡"
-            color={status?.duckdb === 'connected' ? 'green' : 'red'}
-          />
-        </div>
-      </div>
-
-      {/* Features */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-          🎯 Enabled Features
+    <div className="space-y-8">
+      {/* System Status Section */}
+      <section>
+        <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+          <span>🎯</span> System Overview
         </h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          {status?.features && Object.entries(status.features).map(([key, enabled]: [string, any]) => (
-            <div key={key} className="flex items-center space-x-2">
-              <span className={`text-2xl ${enabled ? '✅' : '❌'}`}></span>
-              <span className="capitalize">{key.replace(/_/g, ' ')}</span>
+
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            {[...Array(4)].map((_, i) => <SkeletonCard key={i} />)}
+          </div>
+        ) : error ? (
+          <div className="bg-red-900/20 border border-red-700/50 rounded-lg p-4">
+            <p className="text-red-200 text-sm">{error}</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="kpi-card success">
+              <p className="text-slate-400 text-sm">System Status</p>
+              <p className="text-2xl font-bold text-white mt-2">{status?.app || 'N/A'}</p>
+              <div className="mt-2 text-xs text-emerald-300">✓ Operational</div>
             </div>
-          ))}
-        </div>
-      </div>
+            <div className="kpi-card">
+              <p className="text-slate-400 text-sm">Version</p>
+              <p className="text-2xl font-bold text-white mt-2">{status?.version || 'N/A'}</p>
+              <div className="mt-2 text-xs text-slate-400">Latest</div>
+            </div>
+            <div className={`kpi-card ${status?.database === 'connected' ? 'success' : 'danger'}`}>
+              <p className="text-slate-400 text-sm">PostgreSQL</p>
+              <p className="text-2xl font-bold text-white mt-2">
+                {status?.database === 'connected' ? '✓' : '✗'}
+              </p>
+              <div className={`mt-2 text-xs ${status?.database === 'connected' ? 'text-emerald-300' : 'text-red-300'}`}>
+                {status?.database === 'connected' ? 'Connected' : 'Disconnected'}
+              </div>
+            </div>
+            <div className={`kpi-card ${status?.duckdb === 'connected' ? 'success' : 'warning'}`}>
+              <p className="text-slate-400 text-sm">DuckDB</p>
+              <p className="text-2xl font-bold text-white mt-2">
+                {status?.duckdb === 'connected' ? '✓' : '✗'}
+              </p>
+              <div className={`mt-2 text-xs ${status?.duckdb === 'connected' ? 'text-emerald-300' : 'text-amber-300'}`}>
+                {status?.duckdb === 'connected' ? 'Ready' : 'Loading'}
+              </div>
+            </div>
+          </div>
+        )}
+      </section>
 
-      {/* Analytics Panels */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* KPI Panel */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-          <KPIPanel />
-        </div>
+      {/* KPI Section */}
+      <section>
+        <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+          <span>📊</span> Key Performance Indicators
+        </h2>
+        <KPICards />
+      </section>
 
-        {/* Trends Panel */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-          <TrendsPanel />
-        </div>
-      </div>
+      {/* Feature Status Section */}
+      {status?.features && (
+        <section>
+          <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+            <span>✨</span> Enabled Features
+          </h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {Object.entries(status.features).map(([key, enabled]: [string, any]) => (
+              <div
+                key={key}
+                className={`card flex items-center gap-3 p-4 ${
+                  enabled
+                    ? 'border-emerald-700/50 bg-emerald-900/10'
+                    : 'border-slate-700/30 bg-slate-700/10'
+                }`}
+              >
+                <span className={`text-2xl ${enabled ? '✅' : '❌'}`} />
+                <span className="capitalize text-sm font-medium">
+                  {key.replace(/_/g, ' ')}
+                </span>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
-      {/* Forecasts */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-        <ForecastPanel />
-      </div>
-
-      {/* Anomalies */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-        <AnomalyPanel />
-      </div>
-
-      {/* Recommendations */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-        <RecommendationPanel />
-      </div>
-
-      {/* Quick Links */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-          🔗 Quick Links
+      {/* Quick Links Section */}
+      <section>
+        <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+          <span>🔗</span> Quick Links
         </h2>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          <LinkCard
-            href={`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/docs`}
-            title="📚 API Docs"
-            description="Swagger UI"
-          />
-          <LinkCard
-            href={`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/health`}
-            title="🏥 Health Check"
-            description="System status"
-          />
-          <LinkCard
-            href={import.meta.env.VITE_API_URL || 'http://localhost:8000'}
-            title="🔌 API Root"
-            description="Base endpoint"
-          />
+          <a
+            href={`http://localhost:8000/docs`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="card hover:border-blue-500/50 p-4 cursor-pointer text-center"
+          >
+            <span className="text-3xl block mb-2">📚</span>
+            <p className="font-semibold text-white text-sm">API Docs</p>
+            <p className="text-xs text-slate-400 mt-1">Swagger UI</p>
+          </a>
+          <a
+            href={`http://localhost:8000/health`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="card hover:border-emerald-500/50 p-4 cursor-pointer text-center"
+          >
+            <span className="text-3xl block mb-2">🏥</span>
+            <p className="font-semibold text-white text-sm">Health Check</p>
+            <p className="text-xs text-slate-400 mt-1">System Status</p>
+          </a>
+          <a
+            href={`http://localhost:8000`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="card hover:border-purple-500/50 p-4 cursor-pointer text-center"
+          >
+            <span className="text-3xl block mb-2">🔌</span>
+            <p className="font-semibold text-white text-sm">API Root</p>
+            <p className="text-xs text-slate-400 mt-1">Base Endpoint</p>
+          </a>
         </div>
-      </div>
+      </section>
     </div>
-  )
-}
-
-function StatCard({
-  title,
-  value,
-  icon,
-  color = 'blue',
-}: {
-  title: string
-  value?: string
-  icon: string
-  color?: string
-}) {
-  const colorClasses = {
-    blue: 'bg-blue-50 dark:bg-blue-900 border-blue-200 dark:border-blue-700 text-blue-900 dark:text-blue-100',
-    green: 'bg-green-50 dark:bg-green-900 border-green-200 dark:border-green-700 text-green-900 dark:text-green-100',
-    red: 'bg-red-50 dark:bg-red-900 border-red-200 dark:border-red-700 text-red-900 dark:text-red-100',
-  }
-
-  return (
-    <div className={`border rounded-lg p-6 ${colorClasses[color as keyof typeof colorClasses]}`}>
-      <p className="text-4xl mb-2">{icon}</p>
-      <p className="text-sm font-semibold opacity-75">{title}</p>
-      <p className="text-2xl font-bold mt-2">{value || 'N/A'}</p>
-    </div>
-  )
-}
-
-function LinkCard({
-  href,
-  title,
-  description,
-}: {
-  href: string
-  title: string
-  description: string
-}) {
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="block p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition"
-    >
-      <p className="font-semibold text-blue-600 dark:text-blue-400">{title}</p>
-      <p className="text-sm text-gray-600 dark:text-gray-400">{description}</p>
-    </a>
   )
 }

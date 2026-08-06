@@ -1,120 +1,104 @@
-import axios, { AxiosInstance } from 'axios'
+import axios, { AxiosInstance, AxiosError } from 'axios'
+import {
+  ChatResponse,
+  HealthResponse,
+  StatusResponse,
+  KPI,
+  Trend,
+  Anomaly,
+  Forecast,
+  Recommendation,
+  Analytics,
+} from '../types'
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+// Re-export types for backward compatibility
+export type { ChatResponse, HealthResponse, StatusResponse, KPI, Trend, Anomaly, Forecast, Recommendation, Analytics }
 
+// Detect environment and determine API base URL
+const getAPIBaseURL = (): string => {
+  // 1. Check for explicit environment variable (highest priority)
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL
+  }
+
+  // 2. For Dev Tunnels: detect tunnel ID from hostname and derive backend URL
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname
+
+    // Dev Tunnels pattern: r3r5029m-3000.inc1.devtunnels.ms → r3r5029m-8000.inc1.devtunnels.ms
+    if (hostname.includes('.devtunnels.')) {
+      const parts = hostname.split('-')
+      if (parts.length > 0) {
+        const tunnelId = parts[0]
+        const backendURL = `https://${tunnelId}-8000.inc1.devtunnels.ms`
+        console.log(`[API] Detected Dev Tunnel. Using backend: ${backendURL}`)
+        return backendURL
+      }
+    }
+
+    // 3. Docker networking: if hostname is not localhost, assume Docker internal networking
+    if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
+      // For Docker Compose, backend service is at http://backend:8000
+      const backendURL = `http://${hostname}:8000`
+      console.log(`[API] Detected Docker environment. Using backend: ${backendURL}`)
+      return backendURL
+    }
+  }
+
+  // 4. Default to localhost for local development
+  return 'http://localhost:8000'
+}
+
+const API_BASE_URL = getAPIBaseURL()
+
+// Create axios instance with optimal configuration
 const apiClient: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
   timeout: 120000, // 2 minutes for agent pipeline
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: true,
 })
 
-// Add auth token if available
+// Add request interceptor for authentication and logging
 apiClient.interceptors.request.use((config) => {
   const token = localStorage.getItem('auth_token')
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }
+
+  if (import.meta.env.DEV) {
+    console.log(`[API] ${config.method?.toUpperCase()} ${config.url}`)
+  }
+
   return config
 })
 
-// Types
-export interface ChatRequest {
-  question: string
-  session_id?: string
-}
+// Add response interceptor for error handling and logging
+apiClient.interceptors.response.use(
+  (response) => {
+    if (import.meta.env.DEV) {
+      console.log(`[API] ✓ ${response.status} ${response.config.url}`)
+    }
+    return response
+  },
+  (error: AxiosError) => {
+    if (import.meta.env.DEV) {
+      console.error(`[API] ✗ ${error.config?.url}`, error.response?.status, error.message)
+    }
 
-export interface KPI {
-  [key: string]: number | string
-}
+    // Enhance error messages
+    if (!error.response) {
+      // Network error
+      return Promise.reject(new Error(
+        'Network error. Unable to reach backend. Check your connection and CORS configuration.'
+      ))
+    }
 
-export interface Trend {
-  metric: string
-  direction: 'up' | 'down' | 'stable'
-  percentage: number
-  period: string
-}
-
-export interface Anomaly {
-  metric: string
-  value: number
-  expected: number
-  severity: 'low' | 'medium' | 'high'
-  description: string
-}
-
-export interface Forecast {
-  metric: string
-  value: number
-  confidence_interval: {
-    lower: number
-    upper: number
+    return Promise.reject(error)
   }
-  period: string
-  model: string
-}
-
-export interface Recommendation {
-  id: string
-  title: string
-  description: string
-  priority: 'high' | 'medium' | 'low'
-  expected_impact: string
-  department?: string
-  estimated_cost?: number
-  estimated_savings?: number
-}
-
-export interface Analytics {
-  kpis?: KPI
-  trends?: Trend[]
-  anomalies?: Anomaly[]
-  root_causes?: string[]
-}
-
-export interface ExecutiveSummary {
-  narrative: string
-  key_findings: string[]
-  risks: string[]
-  next_steps: string[]
-}
-
-export interface ChatResponse {
-  session_id: string
-  question: string
-  intent: string
-  sql_result?: any
-  analytics?: Analytics
-  forecasts?: Forecast[]
-  recommendations?: Recommendation[]
-  executive_summary?: ExecutiveSummary
-  response_time_ms: number
-}
-
-export interface HealthResponse {
-  status: 'healthy' | 'degraded' | 'unhealthy'
-  version: string
-  environment: string
-  timestamp: string
-  database: string
-  duckdb: string
-}
-
-export interface StatusResponse {
-  app: string
-  version: string
-  environment: string
-  database: string
-  duckdb: string
-  timestamp: string
-  features: {
-    rag: boolean
-    forecasting: boolean
-    anomaly_detection: boolean
-    power_bi_embed: boolean
-  }
-}
+)
 
 // API Methods
 export const api = {
@@ -130,7 +114,7 @@ export const api = {
   },
 
   // Chat & Analysis
-  chat: async (request: ChatRequest): Promise<ChatResponse> => {
+  chat: async (request: { question: string; session_id?: string }): Promise<ChatResponse> => {
     const { data } = await apiClient.post('/api/chat', request)
     return data
   },
@@ -142,7 +126,7 @@ export const api = {
   },
 
   // Forecasts
-  getForecasts: async (metric?: string, filters?: Record<string, any>): Promise<Forecast[]> => {
+  getForecasts: async (metric?: string, filters?: Record<string, any>): Promise<any[]> => {
     const params = { ...filters }
     if (metric) params.metric = metric
     const { data } = await apiClient.get('/api/forecasts', { params })
@@ -150,13 +134,13 @@ export const api = {
   },
 
   // Anomalies
-  getAnomalies: async (filters?: Record<string, any>): Promise<Anomaly[]> => {
+  getAnomalies: async (filters?: Record<string, any>): Promise<any[]> => {
     const { data } = await apiClient.get('/api/anomalies', { params: filters })
     return data
   },
 
   // Recommendations
-  getRecommendations: async (filters?: Record<string, any>): Promise<Recommendation[]> => {
+  getRecommendations: async (filters?: Record<string, any>): Promise<any[]> => {
     const { data } = await apiClient.get('/api/recommendations', { params: filters })
     return data
   },
@@ -172,7 +156,7 @@ export const api = {
   },
 
   // Analytics
-  getAnalytics: async (question?: string, filters?: Record<string, any>): Promise<Analytics> => {
+  getAnalytics: async (question?: string, filters?: Record<string, any>): Promise<any> => {
     const params = { ...filters }
     if (question) params.question = question
     const { data } = await apiClient.get('/api/analytics', { params })
@@ -181,3 +165,4 @@ export const api = {
 }
 
 export default apiClient
+export { API_BASE_URL }

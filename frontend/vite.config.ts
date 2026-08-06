@@ -6,6 +6,29 @@ export default defineConfig({
   server: {
     port: 3000,
     host: '0.0.0.0',
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+        rewrite: (path) => path,
+      },
+      '/health': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+      },
+      '/status': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+      },
+      '/docs': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+      },
+      '/openapi.json': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+      },
+    },
   },
   build: {
     outDir: 'dist',
