@@ -1,6 +1,25 @@
 import axios, { AxiosInstance } from 'axios'
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+// Determine API base URL: use env var, or derive from current location for Dev Tunnels
+const getAPIBaseURL = (): string => {
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL
+  }
+
+  // For Dev Tunnels: if frontend is on https://r3r5029m-3000.inc1.devtunnels.ms
+  // derive backend from the hostname pattern (r3r5029m is the tunnel ID)
+  if (typeof window !== 'undefined' && window.location.hostname.includes('.devtunnels.')) {
+    const parts = window.location.hostname.split('-')
+    if (parts.length > 0) {
+      const tunnelId = parts[0]
+      return `https://${tunnelId}-8000.inc1.devtunnels.ms`
+    }
+  }
+
+  return 'http://localhost:8000'
+}
+
+const API_BASE_URL = getAPIBaseURL()
 
 const apiClient: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
